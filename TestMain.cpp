@@ -80,11 +80,28 @@ int main() {
 	output << ob_intersection << std::endl;
 
 
-	ob7++;
-	// ob7[N] = rand();
-	std::cout << ob7 << std::endl;
+	CSet ob9(N, arr1);
+	++ob9;
+	output << "Тест префиксного инкремента-> " << std::endl;
+	output << ob9 << std::endl;
 
-	//std::cout << ob10 << std::endl;
+	CSet ob10(N, arr1);
+	--ob10;
+	output << "Тест префиксного декремента-> " << std::endl;
+	output << ob10 << std::endl;
+
+	CSet ob11(N, arr1);
+	ob11++;
+
+	output << "Тест постфиксного инкремента-> " << std::endl;
+	output << ob11 << std::endl;
+
+	CSet ob12(N, arr1);
+	ob12--;
+
+	output << "Тест постфиксного декремента-> " << std::endl;
+	output << ob12 << std::endl;
+
 
 	delete[] arr1;
 	delete[] arr2;
