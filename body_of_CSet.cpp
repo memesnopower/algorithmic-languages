@@ -17,7 +17,7 @@ CSet::CSet(int N, unsigned int* Set) {
 	}
 }
 
-CSet::CSet(const CSet& CS) { // 0
+CSet::CSet(const CSet& CS) { 
 	N = CS.N;
 	this->Set = new unsigned int[N];
 	for (size_t i = 0; i < N; ++i) {
@@ -25,12 +25,12 @@ CSet::CSet(const CSet& CS) { // 0
 	}
 }
 
-CSet::CSet(CSet&& CS) { // 0.1
+CSet::CSet(CSet&& CS) noexcept { 
 	std::swap(N, CS.N);
 	std::swap(Set, CS.Set);
 }
 
-unsigned int& CSet::operator[] (int index) { // 1
+unsigned int& CSet::operator[] (int index) { 
 	return Set[index];
 }
 
@@ -49,7 +49,7 @@ CSet& CSet::operator =(const CSet& Set2)
 	}
 	return *this; 
 }
-CSet& CSet::operator =(CSet&& Set2) 
+CSet& CSet::operator =(CSet&& Set2)  noexcept
 {
 	if (this != &Set2) 
 	{
@@ -61,32 +61,98 @@ CSet& CSet::operator =(CSet&& Set2)
 
 // Перегрузка префиксного инкремента/декремента
 
-CSet& CSet::operator++() { // 2
+CSet& CSet::operator++() {  
 	this->N++;
+	unsigned int* new_set = new unsigned int[N];
+
+	for (size_t i = 0; i < N-1; ++i) {
+		new_set[i] = this->Set[i];
+	}
+	new_set[N - 1] = rand() % 100;
+
+	delete[] Set;
+	Set = new_set;
 	return *this;
 }
 
-CSet& CSet::operator--() { // 3 
+CSet& CSet::operator--() { 
+	int old_size = 0;
+	old_size = this->N;
 	this->N--;
+
+	if (N == 0) {
+		unsigned int* new_set = nullptr;
+		delete[] Set;
+		Set = new_set;
+	}
+	else {
+		unsigned int* new_set = new unsigned int[N];
+
+		for (size_t i = 0; i < N; ++i) {
+			if (i == old_size-1) {
+				break;
+			}
+			else {
+				new_set[i] = this->Set[i];
+			}
+		}
+
+		delete[] Set;
+		Set = new_set;
+	}
 	return *this;
 }
 
 // Перегрузка постфиксного инкремента/декремента
 
-CSet& CSet::operator++(int value) { // 4
+CSet CSet::operator++(int value) {
 	CSet temp(*this);
 	this->N++;
+
+	unsigned int* new_set = new unsigned int[N];
+
+	for (size_t i = 0; i < N - 1; ++i) {
+		new_set[i] = Set[i];
+	}
+	new_set[N - 1] = rand() % 5;
+	delete[] Set;
+	Set = new_set;
+
 	return temp;
 }
 
-CSet& CSet::operator--(int value) { // 5
+CSet CSet::operator--(int value) { 
 	CSet temp(*this);
+	int old_size = 0;
+	old_size = N;
 	this->N--;
+
+	if (N == 0) {
+		unsigned int* new_set = nullptr;
+		delete[] Set;
+		Set = new_set;
+	}
+	else {
+		unsigned int* new_set = new unsigned int[N];
+
+		for (size_t i = 0; i < N; ++i) {
+			if (i == old_size - 1) {
+				break;
+			}
+			else {
+				new_set[i] = Set[i];
+			}
+		}
+		delete[] Set;
+		Set = new_set;
+	}
 	return temp;
 }
 
-CSet operator+(const CSet& Set1, const CSet& Set2) { // 6
+CSet operator+(const CSet& Set1, const CSet& Set2) { 
+
 	// В объединении множеств нет дубликатов, поэтому решил использовать контейнер set
+
 	std::set<unsigned int> merged_set;
 	std::vector<unsigned int> vec_for_mergedSet;
 
@@ -108,7 +174,7 @@ CSet operator+(const CSet& Set1, const CSet& Set2) { // 6
 
 }
 
-CSet operator- (const CSet& Set1, const CSet& Set2) { // 7
+CSet operator- (const CSet& Set1, const CSet& Set2) { 
 
 	// Отсортируем два массива для того чтобы проверить нахождение элементов одного множества в другом
 	// Если одно множество не содержит в себе элементы другого, то пересечением будет пустое множество
@@ -131,14 +197,13 @@ CSet operator- (const CSet& Set1, const CSet& Set2) { // 7
 	}
 
 	CSet ob(vec.size(), Set1.Set);
-
+	
 	for (size_t i = 0; i < vec.size(); ++i) {
 		ob.Set[i] = vec[i];
 	}
-
+		
 	return ob;
 }
-
 
 CSet::~CSet() {
 	if (Set != nullptr) {
